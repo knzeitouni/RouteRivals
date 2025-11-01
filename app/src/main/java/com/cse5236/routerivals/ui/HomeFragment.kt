@@ -1,10 +1,11 @@
-package com.cse5236.routerivals
+package com.cse5236.routerivals.ui
 
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import com.cse5236.routerivals.R
 
 class HomeFragment : Fragment() {
     override fun onCreateView(

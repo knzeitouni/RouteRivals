@@ -1,8 +1,9 @@
-package com.cse5236.routerivals
+package com.cse5236.routerivals.ui
 
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
+import com.cse5236.routerivals.R
 import com.google.android.material.bottomnavigation.BottomNavigationView
 
 class MainActivity : AppCompatActivity() {
@@ -31,4 +32,3 @@ class MainActivity : AppCompatActivity() {
         }
     }
 }
-
