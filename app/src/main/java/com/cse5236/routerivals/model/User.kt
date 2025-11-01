@@ -4,6 +4,7 @@ data class User(
     val id: String = "",
     val name: String = "",
     val email: String = "",
-    val points_all_time: Int = 0,
-    val points_weekly: Int = 0
+    val friends: List<String> = emptyList(),
+    val scores: Map<ScoreType, Int> = emptyMap()
+    //val completedRoutes: List<RouteCompleted>
 )
