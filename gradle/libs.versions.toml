@@ -12,6 +12,9 @@ material = "1.9.0"
 appcompat = "1.7.1"
 fragmentKtx = "1.8.9"
 firebase-bom = "34.5.0"
+maps = "18.2.0"
+location = "21.3.0"
+maps-utils = "3.8.2"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -24,7 +27,10 @@ appcompat = { module = "androidx.appcompat:appcompat", version.ref = "appcompat"
 fragmentKtx = { module = "androidx.fragment:fragment-ktx", version.ref = "fragmentKtx" }
 firebase-bom = { module = "com.google.firebase:firebase-bom", version.ref = "firebase-bom" }
 firebase-analytics = { module = "com.google.firebase:firebase-analytics" }
-
+firebase-firestore = { module = "com.google.firebase:firebase-firestore" }
+google-maps = { module = "com.google.android.gms:play-services-maps", version.ref = "maps" }
+google-location = { module = "com.google.android.gms:play-services-location", version.ref = "location" }
+maps-utils = { module = "com.google.maps.android:android-maps-utils", version.ref = "maps-utils" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
