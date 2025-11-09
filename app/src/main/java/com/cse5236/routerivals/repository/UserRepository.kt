@@ -4,6 +4,9 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.cse5236.routerivals.model.User
 import com.google.firebase.firestore.FirebaseFirestore
+import kotlinx.coroutines.suspendCancellableCoroutine
+import kotlin.coroutines.resume
+import kotlin.coroutines.resumeWithException
 
 class UserRepository {
 
@@ -14,40 +17,53 @@ class UserRepository {
     val usersLiveData: LiveData<List<User>> get() = _usersLiveData
 
     // CREATE / UPDATE
-    fun saveUser(user: User) {
+    suspend fun saveUser(user: User) = suspendCancellableCoroutine<Unit> { cont ->
         usersCollection.document(user.id)
             .set(user)
-            .addOnSuccessListener { println("User saved") }
-            .addOnFailureListener { e -> println("Error saving user: $e") }
-    }
-
-    // READ
-    fun fetchUsers() {
-        usersCollection.get()
-            .addOnSuccessListener { result ->
-                val users = result.map { it.toObject(User::class.java) }
-                _usersLiveData.postValue(users)
-            }
-            .addOnFailureListener { e -> println("Error fetching users: $e") }
-    }
-
-    fun getUser(userId: String, callback: (User?) -> Unit) {
-        usersCollection.document(userId).get()
-            .addOnSuccessListener { doc ->
-                val user = doc.toObject(User::class.java)
-                callback(user)
+            .addOnSuccessListener {
+                println("User saved: ${user.id}")
+                cont.resume(Unit)
             }
             .addOnFailureListener { e ->
-                println("Error fetching user: $e")
-                callback(null)
+                println("Error saving user: $e")
+                cont.resumeWithException(e)
             }
     }
 
-    // DELETE
-    fun deleteUser(userId: String) {
+    suspend fun getUser(userId: String): User? = suspendCancellableCoroutine { cont ->
+        usersCollection.document(userId)
+            .get()
+            .addOnSuccessListener { doc ->
+                cont.resume(doc.toObject(User::class.java))
+            }
+            .addOnFailureListener { e ->
+                println("Error getting user: $e")
+                cont.resumeWithException(e)
+            }
+    }
+
+    suspend fun fetchUsers(): List<User> = suspendCancellableCoroutine { cont ->
+        usersCollection.get()
+            .addOnSuccessListener { snapshot ->
+                val users = snapshot.documents.mapNotNull { it.toObject(User::class.java) }
+                cont.resume(users)
+            }
+            .addOnFailureListener { e ->
+                println("Error fetching users: $e")
+                cont.resumeWithException(e)
+            }
+    }
+
+    suspend fun deleteUser(userId: String) = suspendCancellableCoroutine<Unit> { cont ->
         usersCollection.document(userId)
             .delete()
-            .addOnSuccessListener { println("User deleted") }
-            .addOnFailureListener { e -> println("Error deleting user: $e") }
+            .addOnSuccessListener {
+                println("User deleted: $userId")
+                cont.resume(Unit)
+            }
+            .addOnFailureListener { e ->
+                println("Error deleting user: $e")
+                cont.resumeWithException(e)
+            }
     }
 }

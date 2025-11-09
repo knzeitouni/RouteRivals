@@ -23,8 +23,7 @@ class FriendsFragment : Fragment() {
         Log.d(TAG, "onCreateView")
         // Inflate the layout for this fragment
         val view = inflater.inflate(R.layout.fragment_friends, container, false)
-
-        // Example: reference a TextView in the fragment
+        
         // val textView = view.findViewById<TextView>(R.id.text_friends)
         // textView.text = "This is the Friends screen"
 
