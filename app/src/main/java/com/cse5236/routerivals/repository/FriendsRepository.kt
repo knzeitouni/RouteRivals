@@ -4,6 +4,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 
 class FriendsRepository {
+    // TODO: Replace with firestore
     private val friendsData = mutableListOf("Alice", "Bob", "Charlie")
     private val friendsLiveData = MutableLiveData<List<String>>(friendsData)
 
