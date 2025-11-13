@@ -46,6 +46,7 @@ dependencies {
     implementation(libs.material)
     implementation(libs.appcompat)
     implementation(libs.fragmentKtx)
+    implementation(libs.androidx.recyclerview)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
