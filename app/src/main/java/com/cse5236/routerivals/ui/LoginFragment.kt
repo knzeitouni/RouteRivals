@@ -11,6 +11,7 @@ import android.widget.Toast
 import androidx.fragment.app.Fragment
 import com.cse5236.routerivals.R
 import com.cse5236.routerivals.data.AuthManager
+import com.cse5236.routerivals.MainActivity
 
 class LoginFragment : Fragment() {
 
