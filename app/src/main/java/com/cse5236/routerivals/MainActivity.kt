@@ -60,9 +60,10 @@ class MainActivity : AppCompatActivity() {
                     name = "Jon",
                     email = "JonDoe@emailprovider.com",
                     friends = emptyList(),
-                    scores = emptyMap()
+                    scores = emptyMap(),
+                    completedRoutes = emptyList()
                 )
-                usersRepo.saveUser(testUser)  // suspends until done
+                usersRepo.saveUser(testUser)
 
                 // ---- Read ----
                 val retrievedUser = usersRepo.getUser(testUser.id)

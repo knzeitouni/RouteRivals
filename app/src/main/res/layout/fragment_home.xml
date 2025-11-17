@@ -19,17 +19,17 @@
 
         <EditText
             android:id="@+id/input_distance"
-            android:hint="@string/hint_distance"
-            android:inputType="numberDecimal"
             android:layout_width="150dp"
-            android:layout_height="wrap_content" />
+            android:layout_height="49dp"
+            android:hint="@string/hint_distance"
+            android:inputType="numberDecimal" />
 
         <Button
             android:id="@+id/button_find_routes"
             android:text="@string/button_find_routes"
-            android:layout_marginStart="8dp"
+            android:layout_marginStart="20dp"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
+            android:layout_height="49dp" />
     </LinearLayout>
 
     <!-- Map below controls -->
