@@ -45,12 +45,4 @@ class FriendsAdapter(
         friendsList.addAll(newFriends)
         notifyDataSetChanged()
     }
-
-    fun removeFriend(user: User) {
-        val position = friendsList.indexOfFirst { it.id == user.id }
-        if (position != -1) {
-            friendsList.removeAt(position)
-            notifyItemRemoved(position)
-        }
-    }
 }

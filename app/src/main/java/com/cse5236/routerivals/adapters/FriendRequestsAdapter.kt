@@ -51,12 +51,4 @@ class FriendRequestsAdapter(
         friendRequests.addAll(newRequests)
         notifyDataSetChanged()
     }
-
-    fun removeRequest(user: User) {
-        val position = friendRequests.indexOfFirst { it.id == user.id }
-        if (position != -1) {
-            friendRequests.removeAt(position)
-            notifyItemRemoved(position)
-        }
-    }
 }
