@@ -5,6 +5,8 @@ data class User(
     var name: String = "",
     var email: String = "",
     val friends: List<String> = emptyList(),
-    val scores: Map<String, Int> = emptyMap()
-    //val completedRoutes: List<RouteCompleted>
+    val incomingRequests: List<String> = emptyList(),
+    val outgoingRequests: List<String> = emptyList(),
+    val scores: Map<String, Int> = emptyMap(),
+    val completedRoutes: List<RouteCompleted> = emptyList()
 )

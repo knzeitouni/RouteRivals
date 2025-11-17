@@ -41,20 +41,29 @@ android {
 
 dependencies {
 
+    // AndroidX
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
-    implementation(libs.material)
     implementation(libs.appcompat)
     implementation(libs.fragmentKtx)
     implementation(libs.androidx.recyclerview)
-    testImplementation(libs.junit)
-    androidTestImplementation(libs.androidx.junit)
-    androidTestImplementation(libs.androidx.espresso.core)
+
+    // Material Design
+    implementation(libs.material)
+
+    // Firebase
     implementation(platform(libs.firebase.bom))
     implementation(libs.firebase.analytics)
+    implementation(libs.firebase.auth)
     implementation(libs.firebase.firestore)
+
+    // Google Maps
     implementation(libs.google.maps)
     implementation(libs.google.location)
     implementation(libs.maps.utils)
 
+    // Testing
+    testImplementation(libs.junit)
+    androidTestImplementation(libs.androidx.junit)
+    androidTestImplementation(libs.androidx.espresso.core)
 }

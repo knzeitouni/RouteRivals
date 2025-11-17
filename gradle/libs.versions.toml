@@ -16,6 +16,7 @@ maps = "19.2.0"
 location = "21.3.0"
 maps-utils = "3.19.1"
 recyclerview = "1.4.0"
+googleServices = "4.4.4"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -33,9 +34,11 @@ google-maps = { module = "com.google.android.gms:play-services-maps", version.re
 google-location = { module = "com.google.android.gms:play-services-location", version.ref = "location" }
 maps-utils = { module = "com.google.maps.android:android-maps-utils", version.ref = "maps-utils" }
 androidx-recyclerview = { group = "androidx.recyclerview", name = "recyclerview", version.ref = "recyclerview" }
+firebase-auth = { group = "com.google.firebase", name = "firebase-auth" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
 kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 kotlin-compose = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
+google-services = { id = "com.google.gms.google-services", version.ref = "googleServices" }
 
