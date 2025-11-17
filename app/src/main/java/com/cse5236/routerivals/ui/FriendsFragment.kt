@@ -10,12 +10,14 @@ import android.widget.EditText
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.cse5236.routerivals.R
 import com.cse5236.routerivals.adapters.FriendRequestsAdapter
 import com.cse5236.routerivals.adapters.FriendsAdapter
 import com.cse5236.routerivals.viewmodel.UserViewModel
+import kotlinx.coroutines.launch
 
 class FriendsFragment : Fragment() {
 
@@ -127,10 +129,19 @@ class FriendsFragment : Fragment() {
                 return@setOnClickListener
             }
 
-            userViewModel.sendFriendRequest(friendId)
-            editTextFriendId.text.clear()
+            // Check if user exists first, then send request
+            viewLifecycleOwner.lifecycleScope.launch {
+                val targetUser = userViewModel.sendFriendRequest(friendId)
+                if (targetUser != null) {
+                    Toast.makeText(requireContext(), "Friend request sent to ${targetUser.name}!", Toast.LENGTH_SHORT).show()
+                    editTextFriendId.text.clear()
+                } else {
+                    Toast.makeText(requireContext(), "User '$friendId' not found", Toast.LENGTH_SHORT).show()
+                }
+            }
         }
     }
+
 
     private fun setupObservers() {
         userViewModel.friendRequests.observe(viewLifecycleOwner) { requests ->

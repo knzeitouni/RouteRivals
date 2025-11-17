@@ -1,6 +1,7 @@
 package com.cse5236.routerivals.viewmodel
 
 import android.util.Log
+import android.widget.Toast
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -51,15 +52,14 @@ class UserViewModel : ViewModel() {
     }
 
     // Friend request operations
-    fun sendFriendRequest(toUid: String) {
-        viewModelScope.launch {
-            try {
-                repository.sendFriendRequest(currentUserId, toUid)
-                Log.d("UserViewModel", "Friend request sent successfully to $toUid")
-            } catch (e: Exception) {
-                Log.e("UserViewModel", "Error sending friend request", e)
-            }
+    suspend fun sendFriendRequest(toUid: String): User? {
+        val targetUser = repository.getUser(toUid)
+        if (targetUser != null) {
+            repository.sendFriendRequest(currentUserId, toUid)
+            loadCurrentUser()
+            return targetUser  // Can return value
         }
+        return null
     }
 
     fun acceptFriendRequest(requestingUid: String) {
