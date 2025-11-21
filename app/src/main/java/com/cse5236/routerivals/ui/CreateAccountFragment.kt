@@ -9,17 +9,23 @@ import android.widget.Button
 import android.widget.EditText
 import android.widget.Toast
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.lifecycleScope
 import com.cse5236.routerivals.MainActivity
 import com.cse5236.routerivals.R
-import com.cse5236.routerivals.data.AuthManager
+import com.cse5236.routerivals.model.User
+import com.cse5236.routerivals.repository.UserRepository
+import com.google.firebase.auth.FirebaseAuth
+import kotlinx.coroutines.launch
 
 class CreateAccountFragment : Fragment() {
 
-    private lateinit var authManager: AuthManager
+    private lateinit var auth: FirebaseAuth
+    private lateinit var userRepo: UserRepository
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        authManager = AuthManager(requireContext())
+        auth = FirebaseAuth.getInstance()
+        userRepo = UserRepository()
     }
 
     override fun onCreateView(
@@ -49,13 +55,55 @@ class CreateAccountFragment : Fragment() {
                 return@setOnClickListener
             }
 
-            authManager.createAccount(name, email, password)
+            auth.createUserWithEmailAndPassword(email, password)
+                .addOnCompleteListener { task ->
+                    if (task.isSuccessful) {
+                        val firebaseUser = auth.currentUser
+                        val uid = firebaseUser?.uid
 
-            Toast.makeText(requireContext(), "Account created! Logging in…", Toast.LENGTH_SHORT).show()
+                        if (uid == null) {
+                            Toast.makeText(requireContext(), "Error creating user", Toast.LENGTH_SHORT).show()
+                            return@addOnCompleteListener
+                        }
 
-            val intent = Intent(requireContext(), MainActivity::class.java)
-            startActivity(intent)
-            requireActivity().finish()
+                        val newUser = User(
+                            id = uid,
+                            name = name,
+                            email = email,
+                            friends = emptyList(),
+                            scores = emptyMap()
+                        )
+
+                        viewLifecycleOwner.lifecycleScope.launch {
+                            try {
+                                userRepo.saveUser(newUser)
+
+                                Toast.makeText(
+                                    requireContext(),
+                                    "Account created!",
+                                    Toast.LENGTH_SHORT
+                                ).show()
+
+                                val intent = Intent(requireContext(), MainActivity::class.java)
+                                startActivity(intent)
+                                requireActivity().finish()
+
+                            } catch (e: Exception) {
+                                Toast.makeText(
+                                    requireContext(),
+                                    "Failed to save user: ${e.message}",
+                                    Toast.LENGTH_SHORT
+                                ).show()
+                            }
+                        }
+                    } else {
+                        Toast.makeText(
+                            requireContext(),
+                            task.exception?.localizedMessage ?: "Account creation failed",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    }
+                }
         }
 
         backToLoginButton.setOnClickListener {
