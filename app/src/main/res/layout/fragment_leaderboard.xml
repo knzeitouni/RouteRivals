@@ -1,14 +1,101 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    android:padding="16dp"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:gravity="center"
-    android:orientation="vertical">
+    android:layout_height="match_parent">
+
+    <!-- Time Range Selector -->
+
+
+    <!-- Scope Selector -->
 
     <TextView
-        android:id="@+id/text_leaderboard"
-        android:text="Leaderboard Screen"
+        android:id="@+id/leaderboardTitle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="16dp"
+        android:gravity="center"
+        android:text="Leaderboard"
+        android:textColor="@color/black"
         android:textSize="24sp"
+        android:textStyle="bold" />
+
+    <com.google.android.material.chip.ChipGroup
+        android:id="@+id/timeChipGroup"
+        android:layout_width="385dp"
+        android:layout_height="wrap_content"
+        app:selectionRequired="true"
+        app:singleSelection="true">
+
+        <com.google.android.material.chip.Chip
+            android:id="@+id/chipAllTime"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:checkable="true"
+            android:checked="true"
+            android:text="All Time"
+            android:textAllCaps="false"
+            android:textColor="@color/selector_text_theme"
+            app:chipBackgroundColor="@color/selector_background_theme" />
+
+        <com.google.android.material.chip.Chip
+            android:id="@+id/chipMonthly"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:checkable="true"
+            android:text="Monthly"
+            android:textAllCaps="false"
+            android:textColor="@color/selector_text_theme"
+            app:chipBackgroundColor="@color/selector_background_theme" />
+
+        <com.google.android.material.chip.Chip
+            android:id="@+id/chipDaily"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:checkable="true"
+            android:text="Daily"
+            android:textAllCaps="false"
+            android:textColor="@color/selector_text_theme"
+            app:chipBackgroundColor="@color/selector_background_theme" />
+    </com.google.android.material.chip.ChipGroup>
+
+    <com.google.android.material.chip.ChipGroup
+        android:id="@+id/scopeChipGroup"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content" />
+        android:layout_height="wrap_content"
+        app:selectionRequired="true"
+        app:singleSelection="true">
+
+        <com.google.android.material.chip.Chip
+            android:id="@+id/chipGlobal"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="All Users"
+            android:checkable="true"
+            android:checked="true"
+            android:textColor="@color/selector_text_theme"
+            app:chipBackgroundColor="@color/selector_background_theme" />
+
+        <com.google.android.material.chip.Chip
+            android:id="@+id/chipFriends"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Friends"
+            android:checkable="true"
+            android:textColor="@color/selector_text_theme"
+            app:chipBackgroundColor="@color/selector_background_theme" />
+
+        </com.google.android.material.chip.ChipGroup>
+
+    <!-- Leaderboard RecyclerView -->
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recyclerViewLeaderboard"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_marginTop="12dp"
+        android:layout_weight="1"/>
+
 </LinearLayout>

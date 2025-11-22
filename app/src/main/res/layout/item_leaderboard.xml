@@ -8,7 +8,7 @@
     android:background="?android:attr/selectableItemBackground">
 
     <TextView
-        android:id="@+id/textUsername"
+        android:id="@+id/textRank"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_weight="1"
@@ -16,14 +16,20 @@
         android:text="Friend Name" />
 
     <!-- Remove Friend Button -->
-    <Button
-        android:id="@+id/buttonRemove"
-        android:layout_width="wrap_content"
+    <TextView
+        android:id="@+id/textUsername"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:text="Remove"
+        android:layout_weight="1"
         android:textSize="16sp"
-        android:textColor="@color/selector_text_theme"
-        android:backgroundTint="@color/selector_background_theme"
-        style="@style/Widget.Material3.Button.OutlinedButton" />
+        android:text="Friend Name" />
+
+    <TextView
+        android:id="@+id/textScore"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:textSize="16sp"
+        android:text="Friend Name" />
 
 </LinearLayout>
