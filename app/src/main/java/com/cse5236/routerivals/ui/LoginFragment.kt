@@ -9,17 +9,17 @@ import android.widget.Button
 import android.widget.EditText
 import android.widget.Toast
 import androidx.fragment.app.Fragment
-import com.cse5236.routerivals.R
-import com.cse5236.routerivals.data.AuthManager
 import com.cse5236.routerivals.MainActivity
+import com.cse5236.routerivals.R
+import com.google.firebase.auth.FirebaseAuth
 
 class LoginFragment : Fragment() {
 
-    private lateinit var authManager: AuthManager
+    private lateinit var auth: FirebaseAuth
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        authManager = AuthManager(requireContext())
+        auth = FirebaseAuth.getInstance()
     }
 
     override fun onCreateView(
@@ -47,14 +47,21 @@ class LoginFragment : Fragment() {
                 return@setOnClickListener
             }
 
-            if (authManager.canLogin(email, password)) {
-                // Go to MainActivity
-                val intent = Intent(requireContext(), MainActivity::class.java)
-                startActivity(intent)
-                requireActivity().finish()
-            } else {
-                Toast.makeText(requireContext(), "Invalid email or password", Toast.LENGTH_SHORT).show()
-            }
+            auth.signInWithEmailAndPassword(email, password)
+                .addOnCompleteListener { task ->
+                    if (task.isSuccessful) {
+                        // Go to main app
+                        val intent = Intent(requireContext(), MainActivity::class.java)
+                        startActivity(intent)
+                        requireActivity().finish()
+                    } else {
+                        Toast.makeText(
+                            requireContext(),
+                            task.exception?.localizedMessage ?: "Login failed",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    }
+                }
         }
 
         createAccountButton.setOnClickListener {

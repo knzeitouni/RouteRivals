@@ -10,7 +10,7 @@ class LoginActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_login)
 
-        // Show LoginFragment the first time
+        // Show the login fragment the first time this activity is created
         if (savedInstanceState == null) {
             supportFragmentManager.beginTransaction()
                 .replace(R.id.loginFragmentContainer, LoginFragment())
