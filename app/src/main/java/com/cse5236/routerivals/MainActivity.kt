@@ -7,6 +7,7 @@ import androidx.fragment.app.Fragment
 import com.cse5236.routerivals.ui.FriendsFragment
 import com.cse5236.routerivals.ui.HomeFragment
 import com.cse5236.routerivals.ui.LeaderboardFragment
+import com.cse5236.routerivals.ui.ProfileFragment
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.firebase.FirebaseApp
 import com.google.firebase.firestore.FirebaseFirestore
@@ -40,6 +41,7 @@ class MainActivity : AppCompatActivity() {
                 R.id.nav_home -> HomeFragment()
                 R.id.nav_friends -> FriendsFragment()
                 R.id.nav_leaderboard -> LeaderboardFragment()
+                R.id.nav_profile -> ProfileFragment()  // ADD THIS LINE
                 else -> HomeFragment()
             }
             supportFragmentManager.beginTransaction()
@@ -74,4 +76,3 @@ class MainActivity : AppCompatActivity() {
         Log.d(TAG, "onDestroy")
     }
 }
-

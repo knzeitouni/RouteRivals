@@ -7,11 +7,15 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.cse5236.routerivals.model.User
 import com.cse5236.routerivals.repository.UserRepository
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.launch
 
 class UserViewModel : ViewModel() {
 
     private val repository = UserRepository()
+    private val db = FirebaseFirestore.getInstance()
+    private val auth = FirebaseAuth.getInstance()
 
     // LiveData for all users
     val users: LiveData<List<User>> = repository.usersLiveData
@@ -20,9 +24,8 @@ class UserViewModel : ViewModel() {
     private val _currentUser = MutableLiveData<User?>()
     val currentUser: LiveData<User?> = _currentUser
 
-    // Current user ID (hardcoded for testing)
-    //private var currentUserId: String = repository.getCurrentUser()?.uid ?: "test_current_user_123"
-    private var currentUserId: String = "test_current_user_123"
+    // Use actual Firebase Auth user ID
+    private var currentUserId: String = auth.currentUser?.uid ?: "test_current_user_123"
 
     // LiveData for current user's friends (real data)
     private val _friends = MutableLiveData<List<User>>()
@@ -52,6 +55,41 @@ class UserViewModel : ViewModel() {
     fun loadUsers() {
         viewModelScope.launch {
             repository.fetchUsers()
+        }
+    }
+
+    // ADD POINTS TO CURRENT USER
+    fun addPointsToCurrentUser(points: Int) {
+        val userId = getCurrentUserId()
+        val userRef = db.collection("users").document(userId)
+
+        db.runTransaction { transaction ->
+            val snapshot = transaction.get(userRef)
+
+            // Get current scores map or create empty one
+            @Suppress("UNCHECKED_CAST")
+            val currentScores = snapshot.get("scores") as? Map<String, Long> ?: mapOf(
+                "allTime" to 0L,
+                "monthly" to 0L,
+                "weekly" to 0L,
+                "daily" to 0L
+            )
+
+            // Add points to all time periods
+            val updatedScores = mapOf(
+                "allTime" to (currentScores["allTime"] ?: 0L) + points,
+                "monthly" to (currentScores["monthly"] ?: 0L) + points,
+                "weekly" to (currentScores["weekly"] ?: 0L) + points,
+                "daily" to (currentScores["daily"] ?: 0L) + points
+            )
+
+            transaction.update(userRef, "scores", updatedScores)
+        }.addOnSuccessListener {
+            Log.d("UserViewModel", "Successfully added $points points to user $userId")
+            loadCurrentUser() // Refresh user data
+            loadLeaderboard() // Refresh leaderboard
+        }.addOnFailureListener { e ->
+            Log.e("UserViewModel", "Error adding points: ${e.message}", e)
         }
     }
 
@@ -162,12 +200,15 @@ class UserViewModel : ViewModel() {
     fun createLeaderboardTestData() {
         viewModelScope.launch {
             try {
+                // Get current user ID
+                val actualUserId = auth.currentUser?.uid
+
                 val testUsers = listOf(
                     User(
                         id = "user1",
                         name = "Alice",
                         email = "alice@test.com",
-                        friends = listOf("test_current_user_123"),
+                        friends = if (actualUserId != null) listOf(actualUserId) else emptyList(),
                         incomingRequests = emptyList(),
                         outgoingRequests = emptyList(),
                         scores = mapOf(
@@ -183,7 +224,7 @@ class UserViewModel : ViewModel() {
                         email = "bob@test.com",
                         friends = emptyList(),
                         incomingRequests = emptyList(),
-                        outgoingRequests = listOf("test_current_user_123"),
+                        outgoingRequests = if (actualUserId != null) listOf(actualUserId) else emptyList(),
                         scores = mapOf(
                             "allTime" to 1500,
                             "monthly" to 500,
@@ -197,37 +238,45 @@ class UserViewModel : ViewModel() {
                         email = "charlie@test.com",
                         friends = emptyList(),
                         incomingRequests = emptyList(),
-                        outgoingRequests = listOf("test_current_user_123"),
+                        outgoingRequests = if (actualUserId != null) listOf(actualUserId) else emptyList(),
                         scores = mapOf(
                             "allTime" to 800,
                             "monthly" to 200,
                             "weekly" to 50,
                             "daily" to 10
                         )
-                    ),
-                    User(
-                        id = "test_current_user_123",
-                        name = "You",
-                        email = "you@test.com",
-                        friends = listOf("user1"),
-                        incomingRequests = listOf("user2", "user3"),
-                        outgoingRequests = emptyList(),
-                        scores = mapOf(
-                            "allTime" to 1000,
-                            "monthly" to 250,
-                            "weekly" to 70,
-                            "daily" to 15
-                        )
                     )
                 )
 
-                // Save all test users to Firestore
+                // Save only test users (NOT the current user)
                 testUsers.forEach { user ->
                     repository.saveUser(user)
                 }
-                _currentUser.value = repository.getUser("test_current_user_123")
 
-                Log.d("UserViewModel", "Leaderboard + friend test data created")
+                // If current user doesn't exist in Firestore, create them with 0 points
+                if (actualUserId != null) {
+                    val existingUser = repository.getUser(actualUserId)
+                    if (existingUser == null) {
+                        val newUser = User(
+                            id = actualUserId,
+                            name = auth.currentUser?.displayName ?: auth.currentUser?.email?.substringBefore("@") ?: "You",
+                            email = auth.currentUser?.email ?: "",
+                            friends = emptyList(),
+                            incomingRequests = listOf("user2", "user3"),
+                            outgoingRequests = emptyList(),
+                            scores = mapOf(
+                                "allTime" to 0,
+                                "monthly" to 0,
+                                "weekly" to 0,
+                                "daily" to 0
+                            )
+                        )
+                        repository.saveUser(newUser)
+                    }
+                    _currentUser.value = repository.getUser(actualUserId)
+                }
+
+                Log.d("UserViewModel", "Leaderboard test data created")
                 loadLeaderboard() // Refresh LiveData so the leaderboard updates
 
             } catch (e: Exception) {

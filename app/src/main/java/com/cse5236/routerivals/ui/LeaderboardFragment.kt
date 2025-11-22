@@ -5,22 +5,16 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Button
-import android.widget.EditText
-import android.widget.Toast
+import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.cse5236.routerivals.R
-import com.cse5236.routerivals.adapters.FriendRequestsAdapter
-import com.cse5236.routerivals.adapters.FriendsAdapter
 import com.cse5236.routerivals.adapters.LeaderboardAdapter
 import com.cse5236.routerivals.viewmodel.UserViewModel
 import com.google.android.material.chip.Chip
 import com.google.android.material.chip.ChipGroup
-import kotlinx.coroutines.launch
 
 class LeaderboardFragment : Fragment() {
 
@@ -32,6 +26,9 @@ class LeaderboardFragment : Fragment() {
     private lateinit var scopeChipGroup: ChipGroup
     private lateinit var timeChips: List<Chip>
 
+    private lateinit var textViewYourPoints: TextView
+    private lateinit var textViewYourRank: TextView
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -40,7 +37,7 @@ class LeaderboardFragment : Fragment() {
         Log.d(TAG, "onCreateView")
         val view = inflater.inflate(R.layout.fragment_leaderboard, container, false)
 
-        // Create test data first
+        // Create test data only once (won't overwrite existing user data)
         userViewModel.createLeaderboardTestData()
 
         setupView(view)
@@ -63,6 +60,10 @@ class LeaderboardFragment : Fragment() {
             view.findViewById(R.id.chipDaily)
         )
 
+        // Initialize TextViews for points card
+        textViewYourPoints = view.findViewById(R.id.textViewYourPoints)
+        textViewYourRank = view.findViewById(R.id.textViewYourRank)
+
         // Reload leaderboard when chips change
         timeChips.forEach { chip ->
             chip.setOnClickListener { loadLeaderboard() }
@@ -71,6 +72,7 @@ class LeaderboardFragment : Fragment() {
 
         // Initial load
         loadLeaderboard()
+        userViewModel.loadCurrentUser()
     }
 
     private fun setupObservers() {
@@ -78,7 +80,30 @@ class LeaderboardFragment : Fragment() {
             val selectedTime = getSelectedTime()
             Log.d(TAG, "Updating RecyclerView with ${users.size} users for $selectedTime")
             leaderboardAdapter.updateLeaderboard(users, selectedTime)
+
+            // Update your points and rank
+            updateYourStats(users, selectedTime)
         }
+
+        userViewModel.currentUser.observe(viewLifecycleOwner) { user ->
+            if (user != null) {
+                val selectedTime = getSelectedTime()
+                val points = user.scores[selectedTime] ?: 0
+                textViewYourPoints.text = points.toString()
+                Log.d(TAG, "Updated current user points: $points for $selectedTime")
+            }
+        }
+    }
+
+    private fun updateYourStats(users: List<com.cse5236.routerivals.model.User>, timePeriod: String) {
+        val currentUserId = userViewModel.getCurrentUserId()
+        val yourRank = users.indexOfFirst { it.id == currentUserId } + 1
+        val yourPoints = users.find { it.id == currentUserId }?.scores?.get(timePeriod) ?: 0
+
+        textViewYourPoints.text = yourPoints.toString()
+        textViewYourRank.text = if (yourRank > 0) "#$yourRank" else "-"
+
+        Log.d(TAG, "Your stats - Rank: $yourRank, Points: $yourPoints")
     }
 
     private fun getSelectedTime(): String {
@@ -104,6 +129,9 @@ class LeaderboardFragment : Fragment() {
     override fun onResume() {
         super.onResume()
         Log.d(TAG, "onResume")
+        // Refresh leaderboard when returning to this fragment
+        loadLeaderboard()
+        userViewModel.loadCurrentUser()
     }
 
     override fun onPause() {

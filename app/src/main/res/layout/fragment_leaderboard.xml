@@ -5,12 +5,8 @@
     android:orientation="vertical"
     android:padding="16dp"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
-
-    <!-- Time Range Selector -->
-
-
-    <!-- Scope Selector -->
+    android:layout_height="match_parent"
+    android:background="#F5F5F5">
 
     <TextView
         android:id="@+id/leaderboardTitle"
@@ -23,9 +19,62 @@
         android:textSize="24sp"
         android:textStyle="bold" />
 
+    <!-- Your Points Card -->
+    <androidx.cardview.widget.CardView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="16dp"
+        app:cardCornerRadius="12dp"
+        app:cardElevation="4dp"
+        android:backgroundTint="@color/purple_700">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:padding="20dp"
+            android:gravity="center_vertical">
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="vertical">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Your Points"
+                    android:textSize="14sp"
+                    android:textColor="@android:color/white"
+                    android:alpha="0.9"/>
+
+                <TextView
+                    android:id="@+id/textViewYourPoints"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="0"
+                    android:textSize="32sp"
+                    android:textStyle="bold"
+                    android:textColor="@android:color/white"/>
+            </LinearLayout>
+
+            <TextView
+                android:id="@+id/textViewYourRank"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="#3"
+                android:textSize="48sp"
+                android:textStyle="bold"
+                android:textColor="@android:color/white"
+                android:alpha="0.5"/>
+        </LinearLayout>
+    </androidx.cardview.widget.CardView>
+
+    <!-- Time Range Selector -->
     <com.google.android.material.chip.ChipGroup
         android:id="@+id/timeChipGroup"
-        android:layout_width="385dp"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:selectionRequired="true"
         app:singleSelection="true">
@@ -62,10 +111,12 @@
             app:chipBackgroundColor="@color/selector_background_theme" />
     </com.google.android.material.chip.ChipGroup>
 
+    <!-- Scope Selector -->
     <com.google.android.material.chip.ChipGroup
         android:id="@+id/scopeChipGroup"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginBottom="12dp"
         app:selectionRequired="true"
         app:singleSelection="true">
 
@@ -87,15 +138,13 @@
             android:checkable="true"
             android:textColor="@color/selector_text_theme"
             app:chipBackgroundColor="@color/selector_background_theme" />
-
-        </com.google.android.material.chip.ChipGroup>
+    </com.google.android.material.chip.ChipGroup>
 
     <!-- Leaderboard RecyclerView -->
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recyclerViewLeaderboard"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_marginTop="12dp"
         android:layout_weight="1"/>
 
 </LinearLayout>
