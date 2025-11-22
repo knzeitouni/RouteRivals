@@ -14,4 +14,8 @@
         android:id="@+id/nav_leaderboard"
         android:title="Leaderboard"
         android:icon="@android:drawable/ic_menu_agenda" />
+    <item
+        android:id="@+id/nav_profile"
+        android:title="Profile"
+        android:icon="@android:drawable/ic_menu_preferences" />
 </menu>

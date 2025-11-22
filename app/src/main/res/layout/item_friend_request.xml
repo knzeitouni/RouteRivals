@@ -30,7 +30,10 @@
             android:layout_height="wrap_content"
             android:text="Accept"
             android:layout_marginEnd="8dp"
-            style="@style/Widget.Material3.Button.TonalButton" />
+            android:textSize="16sp"
+            android:textColor="@color/selector_text_theme"
+            android:backgroundTint="@color/selector_background_theme"
+            style="@style/Widget.Material3.Button.OutlinedButton" />
 
         <!-- Decline Button -->
         <Button
@@ -38,6 +41,9 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Decline"
+            android:textSize="16sp"
+            android:textColor="@color/selector_text_theme"
+            android:backgroundTint="@color/selector_background_theme"
             style="@style/Widget.Material3.Button.OutlinedButton" />
 
     </LinearLayout>
