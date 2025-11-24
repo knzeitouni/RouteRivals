@@ -1,55 +1,74 @@
 package com.cse5236.routerivals.ui
 
 import android.Manifest
+import android.annotation.SuppressLint
 import android.content.pm.PackageManager
-import android.location.Location
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
 import android.widget.EditText
 import android.widget.Toast
-import androidx.annotation.RequiresPermission
+import androidx.appcompat.app.AlertDialog
 import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.cse5236.routerivals.R
+import com.cse5236.routerivals.adapters.RouteAdapter
+import com.cse5236.routerivals.model.Route
 import com.cse5236.routerivals.viewmodel.RouteViewModel
+import com.cse5236.routerivals.viewmodel.UserViewModel
+import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
-import com.google.android.gms.maps.CameraUpdateFactory
-import com.google.android.gms.maps.GoogleMap
-import com.google.android.gms.maps.OnMapReadyCallback
-import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.LatLng
-import com.google.android.gms.maps.model.PolylineOptions
-import com.google.maps.android.PolyUtil
-import android.util.Log
 
-class HomeFragment : Fragment(), OnMapReadyCallback {
+class HomeFragment : Fragment() {
 
-    private lateinit var map: GoogleMap
+    private val TAG = "HomeFragment"
+
+    private lateinit var fusedLocationClient: FusedLocationProviderClient
     private val routeViewModel: RouteViewModel by viewModels()
+    private val userViewModel: UserViewModel by viewModels()
 
     private lateinit var distanceInput: EditText
     private lateinit var findRoutesButton: Button
+    private lateinit var routesRecyclerView: RecyclerView
+    private lateinit var routeAdapter: RouteAdapter
 
     private var currentLocation: LatLng? = null
 
+    private val LOCATION_REQUEST_CODE = 100
+
     override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
+        inflater: LayoutInflater,
+        container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
         val view = inflater.inflate(R.layout.fragment_home, container, false)
 
         distanceInput = view.findViewById(R.id.input_distance)
         findRoutesButton = view.findViewById(R.id.button_find_routes)
+        routesRecyclerView = view.findViewById(R.id.recycler_routes)
 
-        val mapFragment = childFragmentManager.findFragmentById(R.id.map_fragment) as SupportMapFragment
-        mapFragment.getMapAsync(this)
+        fusedLocationClient = LocationServices.getFusedLocationProviderClient(requireActivity())
+
+        // Setup RecyclerView with click listener
+        routeAdapter = RouteAdapter { route ->
+            onRouteAccepted(route)
+        }
+        routesRecyclerView.layoutManager = LinearLayoutManager(requireContext())
+        routesRecyclerView.adapter = routeAdapter
+
+        // Get location
+        requestLocationOrGetIt()
 
         findRoutesButton.setOnClickListener {
-            val distanceText = distanceInput.text.toString()
+            val distanceText = distanceInput.text.toString().trim()
             val distance = distanceText.toDoubleOrNull()
 
             if (distance == null || distance <= 0.0) {
@@ -59,67 +78,136 @@ class HomeFragment : Fragment(), OnMapReadyCallback {
 
             val startLocation = currentLocation
             if (startLocation != null) {
+                Log.d(TAG, "Finding routes from $startLocation with distance $distance km")
                 routeViewModel.findLoopRoutes(startLocation, distance)
             } else {
                 Toast.makeText(requireContext(), "Getting location...", Toast.LENGTH_SHORT).show()
+                Log.w(TAG, "Tried to find routes but currentLocation is null")
             }
         }
+
+        setupObservers()
 
         return view
     }
 
-    @RequiresPermission(allOf = [Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION])
-    override fun onMapReady(googleMap: GoogleMap) {
-        map = googleMap
-        getUserLocation()
-        setupObservers()
+    private fun onRouteAccepted(route: Route) {
+        AlertDialog.Builder(requireContext())
+            .setTitle("Accept Route?")
+            .setMessage("Accept this ${String.format("%.1f", route.distance)} km route?\n\nYou'll earn ${calculatePoints(route.distance)} points!")
+            .setPositiveButton("Accept") { dialog, _ ->
+                // Calculate points based on distance
+                val points = calculatePoints(route.distance)
+
+                // Add points to user
+                userViewModel.addPointsToCurrentUser(points)
+
+                Toast.makeText(
+                    requireContext(),
+                    "Route accepted! You earned $points points!",
+                    Toast.LENGTH_LONG
+                ).show()
+
+                // Clear the routes list
+                routeAdapter.submitList(emptyList())
+                distanceInput.text.clear()
+
+                dialog.dismiss()
+            }
+            .setNegativeButton("Cancel") { dialog, _ ->
+                dialog.dismiss()
+            }
+            .show()
     }
 
-    @RequiresPermission(anyOf = [Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION])
-    private fun getUserLocation() {
-        val fusedLocationClient = LocationServices.getFusedLocationProviderClient(requireActivity())
+    private fun calculatePoints(distance: Double): Int {
+        // Award 10 points per km, rounded
+        return (distance * 10).toInt()
+    }
 
+    private fun requestLocationOrGetIt() {
+        val ctx = requireContext()
+        val hasFine = ContextCompat.checkSelfPermission(
+            ctx,
+            Manifest.permission.ACCESS_FINE_LOCATION
+        ) == PackageManager.PERMISSION_GRANTED
+
+        if (!hasFine) {
+            requestPermissions(
+                arrayOf(Manifest.permission.ACCESS_FINE_LOCATION),
+                LOCATION_REQUEST_CODE
+            )
+        } else {
+            getUserLocation()
+        }
+    }
+
+    @SuppressLint("MissingPermission")
+    private fun getUserLocation() {
         if (ActivityCompat.checkSelfPermission(
                 requireContext(),
                 Manifest.permission.ACCESS_FINE_LOCATION
             ) != PackageManager.PERMISSION_GRANTED
         ) {
-            requestPermissions(arrayOf(Manifest.permission.ACCESS_FINE_LOCATION), 100)
+            requestPermissions(
+                arrayOf(Manifest.permission.ACCESS_FINE_LOCATION),
+                LOCATION_REQUEST_CODE
+            )
             return
         }
 
-        // Create a location request for a single, high-accuracy update
-        val locationRequest = com.google.android.gms.location.LocationRequest.Builder(
-            com.google.android.gms.location.Priority.PRIORITY_HIGH_ACCURACY,
-            0L // 0 interval since we want only one update
-        ).setMaxUpdates(1).build()
-
-        val locationCallback = object : com.google.android.gms.location.LocationCallback() {
-            override fun onLocationResult(locationResult: com.google.android.gms.location.LocationResult) {
-                val location = locationResult.lastLocation
-                location?.let {
-                    val userLatLng = LatLng(it.latitude, it.longitude)
+        fusedLocationClient.lastLocation
+            .addOnSuccessListener { location ->
+                if (location != null) {
+                    val userLatLng = LatLng(location.latitude, location.longitude)
                     currentLocation = userLatLng
-                    map.moveCamera(CameraUpdateFactory.newLatLngZoom(userLatLng, 14f))
+                    Log.d(TAG, "Got lastLocation: $userLatLng")
+                } else {
+                    Log.w(TAG, "lastLocation is null, using default location")
+                    val defaultLocation = LatLng(40.0017, -83.0197)
+                    currentLocation = defaultLocation
                 }
             }
-        }
+            .addOnFailureListener { e ->
+                Log.e(TAG, "Error getting location: ${e.message}", e)
+                val defaultLocation = LatLng(40.0017, -83.0197)
+                currentLocation = defaultLocation
+            }
+    }
 
-        fusedLocationClient.requestLocationUpdates(locationRequest, locationCallback, null)
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<out String>,
+        grantResults: IntArray
+    ) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        if (requestCode == LOCATION_REQUEST_CODE &&
+            grantResults.isNotEmpty() &&
+            grantResults[0] == PackageManager.PERMISSION_GRANTED
+        ) {
+            getUserLocation()
+        } else {
+            Toast.makeText(
+                requireContext(),
+                "Location permission needed to find routes near you.",
+                Toast.LENGTH_LONG
+            ).show()
+            Log.w(TAG, "Location permission denied")
+
+            val defaultLocation = LatLng(40.0017, -83.0197)
+            currentLocation = defaultLocation
+        }
     }
 
     private fun setupObservers() {
         routeViewModel.loopRoutes.observe(viewLifecycleOwner) { routes ->
-            map.clear()
-            for (route in routes) {
-                // Decode polyline string into List<LatLng>
-                val path: List<LatLng> = PolyUtil.decode(route.polyline)
-                map.addPolyline(
-                    PolylineOptions()
-                        .addAll(path)
-                        .color(resources.getColor(R.color.purple_700, null))
-                        .width(8f)
-                )
+            Log.d(TAG, "Received ${routes.size} routes from ViewModel")
+
+            if (routes.isEmpty()) {
+                Toast.makeText(requireContext(), "No routes found", Toast.LENGTH_SHORT).show()
+            } else {
+                Toast.makeText(requireContext(), "Found ${routes.size} route(s)", Toast.LENGTH_SHORT).show()
+                routeAdapter.submitList(routes)
             }
         }
     }

@@ -1,14 +1,150 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    android:padding="16dp"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:gravity="center"
-    android:orientation="vertical">
+    android:background="#F5F5F5">
 
     <TextView
-        android:id="@+id/text_leaderboard"
-        android:text="Leaderboard Screen"
+        android:id="@+id/leaderboardTitle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="16dp"
+        android:gravity="center"
+        android:text="Leaderboard"
+        android:textColor="@color/black"
         android:textSize="24sp"
+        android:textStyle="bold" />
+
+    <!-- Your Points Card -->
+    <androidx.cardview.widget.CardView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="16dp"
+        app:cardCornerRadius="12dp"
+        app:cardElevation="4dp"
+        android:backgroundTint="@color/purple_700">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:padding="20dp"
+            android:gravity="center_vertical">
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="vertical">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Your Points"
+                    android:textSize="14sp"
+                    android:textColor="@android:color/white"
+                    android:alpha="0.9"/>
+
+                <TextView
+                    android:id="@+id/textViewYourPoints"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="0"
+                    android:textSize="32sp"
+                    android:textStyle="bold"
+                    android:textColor="@android:color/white"/>
+            </LinearLayout>
+
+            <TextView
+                android:id="@+id/textViewYourRank"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="#3"
+                android:textSize="48sp"
+                android:textStyle="bold"
+                android:textColor="@android:color/white"
+                android:alpha="0.5"/>
+        </LinearLayout>
+    </androidx.cardview.widget.CardView>
+
+    <!-- Time Range Selector -->
+    <com.google.android.material.chip.ChipGroup
+        android:id="@+id/timeChipGroup"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:selectionRequired="true"
+        app:singleSelection="true">
+
+        <com.google.android.material.chip.Chip
+            android:id="@+id/chipAllTime"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:checkable="true"
+            android:checked="true"
+            android:text="All Time"
+            android:textAllCaps="false"
+            android:textColor="@color/selector_text_theme"
+            app:chipBackgroundColor="@color/selector_background_theme" />
+
+        <com.google.android.material.chip.Chip
+            android:id="@+id/chipMonthly"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:checkable="true"
+            android:text="Monthly"
+            android:textAllCaps="false"
+            android:textColor="@color/selector_text_theme"
+            app:chipBackgroundColor="@color/selector_background_theme" />
+
+        <com.google.android.material.chip.Chip
+            android:id="@+id/chipDaily"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:checkable="true"
+            android:text="Daily"
+            android:textAllCaps="false"
+            android:textColor="@color/selector_text_theme"
+            app:chipBackgroundColor="@color/selector_background_theme" />
+    </com.google.android.material.chip.ChipGroup>
+
+    <!-- Scope Selector -->
+    <com.google.android.material.chip.ChipGroup
+        android:id="@+id/scopeChipGroup"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content" />
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="12dp"
+        app:selectionRequired="true"
+        app:singleSelection="true">
+
+        <com.google.android.material.chip.Chip
+            android:id="@+id/chipGlobal"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="All Users"
+            android:checkable="true"
+            android:checked="true"
+            android:textColor="@color/selector_text_theme"
+            app:chipBackgroundColor="@color/selector_background_theme" />
+
+        <com.google.android.material.chip.Chip
+            android:id="@+id/chipFriends"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Friends"
+            android:checkable="true"
+            android:textColor="@color/selector_text_theme"
+            app:chipBackgroundColor="@color/selector_background_theme" />
+    </com.google.android.material.chip.ChipGroup>
+
+    <!-- Leaderboard RecyclerView -->
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recyclerViewLeaderboard"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"/>
+
 </LinearLayout>

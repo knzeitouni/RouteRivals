@@ -31,7 +31,7 @@ class FriendRequestsAdapter(
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val user = friendRequests[position]
 
-        holder.usernameTextView.text = user.name // or user.id depending on what you want to display
+        holder.usernameTextView.text = user.name
 
         holder.acceptButton.setOnClickListener {
             onAccept(user)

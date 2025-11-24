@@ -2,6 +2,12 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
 
+    <!-- Permissions -->
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+
     <application
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
@@ -12,6 +18,12 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.RouteRivals">
 
+        <!-- Google Maps API key -->
+        <meta-data
+            android:name="com.google.android.geo.API_KEY"
+            android:value="AIzaSyDMa36x4UUGdyOykQkyWNVzIZ-MaJ_-r28" />
+
+        <!-- Login is the launcher activity -->
         <activity
             android:name=".ui.LoginActivity"
             android:exported="true"
@@ -23,11 +35,13 @@
             </intent-filter>
         </activity>
 
+        <!-- Main app activity (after login) -->
         <activity
-            android:name=".ui.MainActivity"
+            android:name=".MainActivity"
             android:exported="false"
             android:label="@string/app_name"
             android:theme="@style/Theme.RouteRivals" />
+
     </application>
 
 </manifest>
