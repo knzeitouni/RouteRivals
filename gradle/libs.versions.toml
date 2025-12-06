@@ -17,6 +17,7 @@ location = "21.3.0"
 maps-utils = "3.19.1"
 recyclerview = "1.4.0"
 googleServices = "4.4.4"
+coroutines = "1.7.3"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -35,6 +36,7 @@ google-location = { module = "com.google.android.gms:play-services-location", ve
 maps-utils = { module = "com.google.maps.android:android-maps-utils", version.ref = "maps-utils" }
 androidx-recyclerview = { group = "androidx.recyclerview", name = "recyclerview", version.ref = "recyclerview" }
 firebase-auth = { group = "com.google.firebase", name = "firebase-auth" }
+coroutines-test = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-test", version.ref = "coroutines" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

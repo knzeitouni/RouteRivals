@@ -45,4 +45,9 @@ class FriendsAdapter(
         friendsList.addAll(newFriends)
         notifyDataSetChanged()
     }
+
+    fun clear() {
+        friendsList.clear()
+        notifyDataSetChanged()
+    }
 }

@@ -51,4 +51,9 @@ class FriendRequestsAdapter(
         friendRequests.addAll(newRequests)
         notifyDataSetChanged()
     }
+
+    fun clear() {
+        friendRequests.clear()
+        notifyDataSetChanged()
+    }
 }

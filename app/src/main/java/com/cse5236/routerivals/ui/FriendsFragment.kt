@@ -60,6 +60,14 @@ class FriendsFragment : Fragment() {
     override fun onDestroyView() {
         super.onDestroyView()
         Log.d(TAG, "onDestroyView")
+
+        view?.findViewById<RecyclerView>(R.id.recyclerViewFriendRequests)?.adapter = null
+        view?.findViewById<RecyclerView>(R.id.recyclerViewFriends)?.adapter = null
+
+        friendRequestsAdapter.clear()
+        friendsAdapter.clear()
+
+        userViewModel.unloadFriendData()
     }
 
     override fun onDestroy() {

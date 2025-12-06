@@ -147,10 +147,12 @@ class LeaderboardFragment : Fragment() {
     override fun onDestroyView() {
         super.onDestroyView()
         Log.d(TAG, "onDestroyView")
+        userViewModel.unloadLeaderboardData()
     }
 
     override fun onDestroy() {
         super.onDestroy()
+        recyclerView.adapter = null
         Log.d(TAG, "onDestroy")
     }
 }

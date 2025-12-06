@@ -187,6 +187,11 @@ class UserViewModel : ViewModel() {
         }
     }
 
+    fun unloadFriendData() {
+        _friends.value = emptyList()
+        _friendRequests.value = emptyList()
+    }
+
     // Method to update current user when Firebase Auth is ready
     fun setCurrentUser(uid: String) {
         currentUserId = uid
@@ -311,5 +316,9 @@ class UserViewModel : ViewModel() {
                 Log.e("UserViewModel", "Error loading leaderboard", e)
             }
         }
+    }
+
+    fun unloadLeaderboardData() {
+        _leaderboard.value = emptyList()
     }
 }
