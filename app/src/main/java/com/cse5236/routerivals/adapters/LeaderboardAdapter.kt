@@ -9,7 +9,6 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.cse5236.routerivals.R
 import com.cse5236.routerivals.model.LeaderboardEntry
-import com.cse5236.routerivals.model.User   // <--- added
 
 class LeaderboardAdapter :
     ListAdapter<LeaderboardEntry, LeaderboardAdapter.LeaderboardViewHolder>(DIFF_CALLBACK) {
@@ -60,26 +59,4 @@ class LeaderboardAdapter :
             textPoints.text = entry.points.toString()
         }
     }
-
-    /**
-     * Called from LeaderboardFragment:
-     *   leaderboardAdapter.updateLeaderboard(users, selectedTime)
-     *
-     * Converts the List<User> from the ViewModel into a List<LeaderboardEntry>
-     * for this adapter, based on the selected time period.
-     */
-    fun updateLeaderboard(users: List<User>, timePeriod: String) {
-        val entries = users.map { user ->
-            // scores[...] is Int, convert to Long
-            val points: Long = (user.scores[timePeriod] ?: 0).toLong()
-
-            LeaderboardEntry(
-                userId = user.id,
-                name = user.name,
-                points = points
-            )
-        }
-        submitList(entries)
-    }
-
 }
