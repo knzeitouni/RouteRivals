@@ -1,139 +1,137 @@
 package com.cse5236.routerivals.ui
 
+import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Button
 import android.widget.TextView
 import android.widget.Toast
-import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.viewModels
 import com.cse5236.routerivals.R
-import com.cse5236.routerivals.viewmodel.UserViewModel
+import com.google.android.material.button.MaterialButton
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.FirebaseUser
+import com.google.firebase.firestore.FirebaseFirestore
 
 class ProfileFragment : Fragment() {
-    private val TAG = "ProfileFragment"
-    private val userViewModel: UserViewModel by viewModels()
-    private lateinit var auth: FirebaseAuth
 
-    private lateinit var textViewUsername: TextView
-    private lateinit var textViewEmail: TextView
+    private val TAG = "ProfileFragment"
+
+    private lateinit var auth: FirebaseAuth
+    private lateinit var db: FirebaseFirestore
+
+    private lateinit var textUserName: TextView
+    private lateinit var textUserEmail: TextView
+    private lateinit var buttonLogout: MaterialButton
+    private lateinit var buttonDeleteProfile: MaterialButton
 
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        Log.d(TAG, "onCreateView")
+        // Inflate the pretty layout
         val view = inflater.inflate(R.layout.fragment_profile, container, false)
 
         auth = FirebaseAuth.getInstance()
+        db = FirebaseFirestore.getInstance()
 
-        // Initialize views
-        textViewUsername = view.findViewById(R.id.textViewUsername)
-        textViewEmail = view.findViewById(R.id.textViewEmail)
+        // Initialize views (IDs must match fragment_profile.xml)
+        textUserName = view.findViewById(R.id.textUserName)
+        textUserEmail = view.findViewById(R.id.textUserEmail)
+        buttonLogout = view.findViewById(R.id.buttonLogout)
+        buttonDeleteProfile = view.findViewById(R.id.buttonDeleteProfile)
 
-        val buttonLogout = view.findViewById<Button>(R.id.buttonLogout)
-        val buttonDeleteProfile = view.findViewById<Button>(R.id.buttonDeleteProfile)
-
-        // Load user data
-        loadUserProfile()
-
-        // Logout button
-        buttonLogout.setOnClickListener {
-            AlertDialog.Builder(requireContext())
-                .setTitle("Log Out")
-                .setMessage("Are you sure you want to log out?")
-                .setPositiveButton("Log Out") { dialog, _ ->
-                    auth.signOut()
-                    Toast.makeText(requireContext(), "Logged out successfully", Toast.LENGTH_SHORT).show()
-                    // Navigate back to login
-                    requireActivity().finish()
-                    dialog.dismiss()
-                }
-                .setNegativeButton("Cancel") { dialog, _ ->
-                    dialog.dismiss()
-                }
-                .show()
-        }
-
-        // Delete Profile button
-        buttonDeleteProfile.setOnClickListener {
-            AlertDialog.Builder(requireContext())
-                .setTitle("Delete Profile")
-                .setMessage("Are you sure you want to delete your profile? This action cannot be undone.")
-                .setPositiveButton("Delete") { dialog, _ ->
-                    userViewModel.removeUser(userViewModel.getCurrentUserId())
-                    Toast.makeText(requireContext(), "Profile deleted", Toast.LENGTH_SHORT).show()
-                    auth.signOut()
-                    requireActivity().finish()
-                    dialog.dismiss()
-                }
-                .setNegativeButton("Cancel") { dialog, _ ->
-                    dialog.dismiss()
-                }
-                .show()
-        }
+        setupButtons()
+        loadUserInfo()
 
         return view
     }
 
-    private fun loadUserProfile() {
-        val currentUser = auth.currentUser
-        if (currentUser != null) {
-            // Get display name or email username
-            val displayName = currentUser.displayName
-            val email = currentUser.email ?: ""
+    private fun setupButtons() {
+        // Log out
+        buttonLogout.setOnClickListener {
+            auth.signOut()
+            Toast.makeText(requireContext(), "Logged out", Toast.LENGTH_SHORT).show()
 
-            // If no display name, use the part before @ in email
-            val username = if (!displayName.isNullOrEmpty()) {
-                displayName
-            } else {
-                email.substringBefore("@")
+            // Go back to LoginActivity and clear back stack
+            val intent = Intent(requireContext(), LoginActivity::class.java).apply {
+                flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+            }
+            startActivity(intent)
+        }
+
+        // Delete profile (Firebase Auth user only)
+        buttonDeleteProfile.setOnClickListener {
+            val user = auth.currentUser
+            if (user == null) {
+                Toast.makeText(requireContext(), "No user is signed in", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
             }
 
-            textViewUsername.text = username
-            textViewEmail.text = email
+            user.delete()
+                .addOnCompleteListener { task ->
+                    if (task.isSuccessful) {
+                        Toast.makeText(requireContext(), "Profile deleted", Toast.LENGTH_SHORT).show()
 
-            Log.d(TAG, "Loaded profile - Username: $username, Email: $email")
-        } else {
-            Log.w(TAG, "No user logged in")
-            textViewUsername.text = "Not logged in"
-            textViewEmail.text = "Not available"
+                        val intent = Intent(requireContext(), LoginActivity::class.java).apply {
+                            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                        }
+                        startActivity(intent)
+                    } else {
+                        Log.e(TAG, "Failed to delete user", task.exception)
+                        Toast.makeText(
+                            requireContext(),
+                            "Failed to delete profile. Try again.",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    }
+                }
         }
     }
 
-    override fun onStart() {
-        super.onStart()
-        Log.d(TAG, "onStart")
-    }
+    private fun loadUserInfo() {
+        val user: FirebaseUser? = auth.currentUser
 
-    override fun onResume() {
-        super.onResume()
-        Log.d(TAG, "onResume")
-    }
+        if (user == null) {
+            Log.w(TAG, "No logged-in user found")
+            textUserName.text = "Unknown"
+            textUserEmail.text = "Not signed in"
+            return
+        }
 
-    override fun onPause() {
-        super.onPause()
-        Log.d(TAG, "onPause")
-    }
+        val uid = user.uid
+        val authDisplayName = user.displayName
+        val authEmail = user.email
 
-    override fun onStop() {
-        super.onStop()
-        Log.d(TAG, "onStop")
-    }
+        // Show auth values immediately as a fallback
+        textUserName.text = authDisplayName ?: "Unnamed User"
+        textUserEmail.text = authEmail ?: "No email"
 
-    override fun onDestroyView() {
-        super.onDestroyView()
-        Log.d(TAG, "onDestroyView")
-    }
+        // Then try to override with Firestore data from users/{uid}
+        db.collection("users").document(uid).get()
+            .addOnSuccessListener { doc ->
+                if (!isAdded) return@addOnSuccessListener
 
-    override fun onDestroy() {
-        super.onDestroy()
-        Log.d(TAG, "onDestroy")
+                if (doc.exists()) {
+                    val nameFromDb = doc.getString("name")
+                    val emailFromDb = doc.getString("email")
+
+                    val finalName = nameFromDb ?: authDisplayName ?: "Unnamed User"
+                    val finalEmail = emailFromDb ?: authEmail ?: "No email"
+
+                    textUserName.text = finalName
+                    textUserEmail.text = finalEmail
+                } else {
+                    Log.w(TAG, "User document $uid does not exist in Firestore")
+                }
+            }
+            .addOnFailureListener { e ->
+                if (!isAdded) return@addOnFailureListener
+                Log.e(TAG, "Failed to load user profile from Firestore", e)
+                // We already showed auth info above, so just keep it
+            }
     }
 }

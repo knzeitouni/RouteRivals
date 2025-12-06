@@ -2,5 +2,6 @@
     <string name="app_name">RouteRivals</string>
     <string name="hint_distance">Distance (km)</string>
     <string name="button_find_routes">Find Routes</string>
+    <string name="google_maps_key">AIzaSyAG4F5lH95w7uhNWictEWR5q-I4Kr0Ky3o</string>
 
 </resources>

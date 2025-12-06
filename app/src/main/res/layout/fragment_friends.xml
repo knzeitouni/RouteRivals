@@ -1,65 +1,126 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:padding="16dp">
+    android:padding="16dp"
+    android:background="@color/white">
 
-    <!-- Add Friend Row -->
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:gravity="center_vertical"
-        android:layout_marginBottom="12dp">
-
-        <EditText
-            android:id="@+id/editTextFriendId"
-            android:layout_width="0dp"
-            android:layout_height="48dp"
-            android:layout_weight="1"
-            android:hint="Search User ID"
-            android:inputType="text"
-            android:imeOptions="actionDone"
-            android:padding="8dp" />
-
-        <Button
-            android:id="@+id/buttonAddFriend"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Add Friend"
-            android:layout_marginStart="8dp" />
-    </LinearLayout>
-
-    <!-- Friends List -->
+    <!-- Title -->
     <TextView
-        android:layout_width="match_parent"
+        android:id="@+id/textFriendsTitle"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:text="Friends"
-        android:textSize="18sp"
+        android:textSize="24sp"
         android:textStyle="bold"
-        android:layout_marginBottom="8dp" />
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/recyclerViewFriends"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1"
-        android:clipToPadding="false"
-        android:paddingBottom="8dp" />
-    <!-- Friend Requests -->
+        android:textColor="@color/black"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+    <!-- Add Friend Card -->
+    <com.google.android.material.card.MaterialCardView
+        android:id="@+id/cardAddFriend"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="12dp"
+        app:cardCornerRadius="16dp"
+        app:cardUseCompatPadding="true"
+        app:cardElevation="4dp"
+        app:layout_constraintTop_toBottomOf="@id/textFriendsTitle"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="12dp">
+
+            <TextView
+                android:id="@+id/textAddFriendLabel"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Add a friend"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                android:textColor="@color/black" />
+
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/textInputFriendId"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:hint="Friend's user ID">
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/editTextFriendId"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:inputType="text" />
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/buttonAddFriend"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:text="Send Request"
+                style="?attr/materialButtonOutlinedStyle" />
+        </LinearLayout>
+    </com.google.android.material.card.MaterialCardView>
+
+    <!-- Friend Requests Header -->
     <TextView
-        android:layout_width="match_parent"
+        android:id="@+id/textFriendRequestsLabel"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:text="Friend Requests"
-        android:textSize="18sp"
+        android:textSize="16sp"
         android:textStyle="bold"
-        android:layout_marginBottom="8dp" />
+        android:textColor="@color/black"
+        android:layout_marginTop="16dp"
+        app:layout_constraintTop_toBottomOf="@id/cardAddFriend"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+    <!-- Friend Requests List -->
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recyclerViewFriendRequests"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1"
-        android:clipToPadding="false"
-        android:paddingBottom="8dp" />
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:overScrollMode="never"
+        app:layout_constraintTop_toBottomOf="@id/textFriendRequestsLabel"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
 
-</LinearLayout>
+    <!-- Friends Header -->
+    <TextView
+        android:id="@+id/textFriendsLabel"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="Your Friends"
+        android:textSize="16sp"
+        android:textStyle="bold"
+        android:textColor="@color/black"
+        android:layout_marginTop="16dp"
+        app:layout_constraintTop_toBottomOf="@id/recyclerViewFriendRequests"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+    <!-- Friends List -->
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recyclerViewFriends"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginTop="8dp"
+        android:overScrollMode="never"
+        app:layout_constraintTop_toBottomOf="@id/textFriendsLabel"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

@@ -106,17 +106,24 @@ class FriendsFragment : Fragment() {
     }
 
     private fun setupRecyclerViews(view: View) {
-        val recyclerViewFriendRequests = view.findViewById<RecyclerView>(R.id.recyclerViewFriendRequests)
-        val recyclerViewFriends = view.findViewById<RecyclerView>(R.id.recyclerViewFriends)
+        val recyclerViewFriendRequests =
+            view.findViewById<RecyclerView>(R.id.recyclerViewFriendRequests)
+        val recyclerViewFriends =
+            view.findViewById<RecyclerView>(R.id.recyclerViewFriends)
 
         recyclerViewFriendRequests.apply {
             adapter = friendRequestsAdapter
             layoutManager = LinearLayoutManager(requireContext())
+            setHasFixedSize(true)
+            isNestedScrollingEnabled = false
         }
 
         recyclerViewFriends.apply {
             adapter = friendsAdapter
             layoutManager = LinearLayoutManager(requireContext())
+            setHasFixedSize(true)
+            // let the main screen scroll smoothly
+            isNestedScrollingEnabled = false
         }
     }
 
@@ -133,7 +140,11 @@ class FriendsFragment : Fragment() {
             }
 
             if (friendId == userViewModel.getCurrentUserId()) {
-                Toast.makeText(requireContext(), "You cannot add yourself as a friend", Toast.LENGTH_SHORT).show()
+                Toast.makeText(
+                    requireContext(),
+                    "You cannot add yourself as a friend",
+                    Toast.LENGTH_SHORT
+                ).show()
                 return@setOnClickListener
             }
 
@@ -141,15 +152,22 @@ class FriendsFragment : Fragment() {
             viewLifecycleOwner.lifecycleScope.launch {
                 val targetUser = userViewModel.sendFriendRequest(friendId)
                 if (targetUser != null) {
-                    Toast.makeText(requireContext(), "Friend request sent to ${targetUser.name}!", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(
+                        requireContext(),
+                        "Friend request sent to ${targetUser.name}!",
+                        Toast.LENGTH_SHORT
+                    ).show()
                     editTextFriendId.text.clear()
                 } else {
-                    Toast.makeText(requireContext(), "User '$friendId' not found", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(
+                        requireContext(),
+                        "User '$friendId' not found",
+                        Toast.LENGTH_SHORT
+                    ).show()
                 }
             }
         }
     }
-
 
     private fun setupObservers() {
         userViewModel.friendRequests.observe(viewLifecycleOwner) { requests ->
@@ -166,6 +184,6 @@ class FriendsFragment : Fragment() {
         userViewModel.loadUsers()
 
         // For testing purposes
-        //userViewModel.createTestData()
+        // userViewModel.createTestData()
     }
 }
